@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1045711128515",
+    "firebase_url": "https://chatwithyuki-86907.firebaseio.com",
+    "project_id": "chatwithyuki-86907",
+    "storage_bucket": "chatwithyuki-86907.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1045711128515:android:248a66b6d7f63897",
+        "android_client_info": {
+          "package_name": "miaoyipu.chatwithyuki"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1045711128515-tbbvt238eg6g2ve8aa1slile5kq2tin8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "miaoyipu.chatwithyuki",
+            "certificate_hash": "2e8434611068cc4b346db9bc70f4291c9ed0d920"
+          }
+        },
+        {
+          "client_id": "1045711128515-v28dftq8s030ncq5n1k28l575movtnnt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjPyxIw1nY8RqYGNdiGo7YwNUH4GUe0II"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1045711128515-v28dftq8s030ncq5n1k28l575movtnnt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

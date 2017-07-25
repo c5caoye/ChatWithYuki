@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ChatWithYuki</string>
+    <string name="msgInputHint">请输入消息。</string>
+    <string name="welcomeMessage">欢迎回来 </string>
+    <string name="welcomePostFix"> 酱~</string>
+    <string name="signInSuccess">登陆成功~欢迎！！</string>
+    <string name="signInFail">登录失败了呢，请稍后重试？</string>
+    <string name="yuki">小白白</string>
+</resources>

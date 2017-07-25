@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="miaoyipu.chatwithyuki.MainActivity">
+
+    <ListView
+        android:id="@+id/main_msgList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/main_sendFab"
+        android:dividerHeight="16dp"
+        android:divider="@android:color/transparent"
+        android:layout_marginBottom="10dp"
+        android:transcriptMode="alwaysScroll"
+        android:stackFromBottom="true">
+
+    </ListView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/main_sendFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/main_sendFab"
+        android:layout_alignParentBottom="true">
+
+        <EditText
+            android:id="@+id/main_textInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/msgInputHint"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+</RelativeLayout>
