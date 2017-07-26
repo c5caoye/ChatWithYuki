@@ -1,4 +1,4 @@
-package miaoyipu.chatwithyuki;
+package miaoyipu.chatwithyuki.Models;
 
 import java.util.Date;
 
@@ -9,13 +9,21 @@ import java.util.Date;
  */
 
 public class ChatMessage {
-    private String msgText, msgUser, uid;
+    private String msgText, authorName, from, to;
     private long msgTime;
 
-    public ChatMessage(String text, String user, String uid) {
+    /**
+     *
+     * @param text message text
+     * @param author author of the message
+     * @param from author uid
+     * @param to target uid
+     */
+    public ChatMessage(String text, String author, String from, String to) {
         this.msgText = text;
-        this.msgUser = user;
-        this.uid = uid;
+        this.authorName = author;
+        this.from = from;
+        this.to = to;
         this.msgTime = new Date().getTime();
     }
 
@@ -32,12 +40,12 @@ public class ChatMessage {
         this.msgText = msgText;
     }
 
-    public String getMsgUser() {
-        return msgUser;
+    public String getAuthorName() {
+        return authorName;
     }
 
-    public void setMsgUser(String msgUser) {
-        this.msgUser = msgUser;
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 
     public long getMsgTime() {
@@ -48,11 +56,11 @@ public class ChatMessage {
         this.msgTime = msgTime;
     }
 
-    public String getUid() {
-        return uid;
+    public String getFrom() {
+        return from;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setFrom(String from) {
+        this.from = from;
     }
 }

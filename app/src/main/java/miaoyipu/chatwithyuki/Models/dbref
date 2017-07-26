@@ -1,0 +1,16 @@
+db{
+
+    "users" : {
+        "uid1" : {
+            uid,
+            name,
+            chats: {
+                uid1 : {msg1 : {text, author name, from, to}, msg2 {...}, msg3 {...}},
+                uid2 : {...},
+                ...
+            }
+        },
+        uid2 {....}
+    }
+
+}

@@ -13,6 +13,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
@@ -20,6 +22,8 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static miaoyipu.chatwithyuki.Utility.postBotMessage;
 
 /**
  * Created by cy804 on 2017-07-24.
@@ -52,17 +56,13 @@ public class RequestQueueSingleton {
         return requestQueue;
     }
 
-    public <T> void addToRequestQueue(Request<T> req) {
-        getRequestQueue().add(req);
-    }
-
-    public static void postNewMessage(final Context context, final String message, final String uid) {
-        RequestQueue requestQueue = RequestQueueSingleton.getInstance(context).getRequestQueue();
+    public static void postNewMessage(final Context context, final DatabaseReference database, String message, final FirebaseUser user) {
+        final RequestQueue requestQueue = RequestQueueSingleton.getInstance(context).getRequestQueue();
 
         HashMap<String, String> params = new HashMap<>();
         params.put("key", KEY);
         params.put("info", message);
-        params.put("userid", uid);
+        params.put("userid", user.getUid());
 
         JsonObjectRequest req = new JsonObjectRequest(RequestQueueSingleton.UURL, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
@@ -70,11 +70,7 @@ public class RequestQueueSingleton {
                     public void onResponse(JSONObject response) {
                         try {
                             Log.d(TAG, response.getString("text"));
-                            FirebaseDatabase.getInstance()
-                                    .getReference()
-                                    .push()
-                                    .setValue(new ChatMessage(response.getString("text"), context.getString(R.string.yuki),
-                                            FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                            postBotMessage(database, response.getString("text"), user.getUid());
 
                         } catch(JSONException e) {
                             e.printStackTrace();
@@ -89,48 +85,6 @@ public class RequestQueueSingleton {
         });
 
         requestQueue.add(req);
-
-
-//        StringRequest sr = new StringRequest(Request.Method.POST, RequestQueueSingleton.UURL, new Response.Listener<String>() {
-//            @Override
-//            public void onResponse(String response) {
-//                Log.d(RequestQueueSingleton.TAG, response);
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                error.printStackTrace();
-//            }
-//        }) {
-//            @Override
-//            protected Map<String, String> getParams() {
-//                Map<String, String> params = new HashMap<>();
-//                params.put("key", KEY);
-//                params.put("info", message);
-//
-//                return params;
-//            }
-//
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                Map<String, String> params = new HashMap<>();
-////                params.put("Content-type", "text/html");
-////                params.put("charset", "utf-8");
-//                params.put("Content-Type","application/x-www-form-urlencoded");
-//
-//                return params;
-//            }
-//        };
-//
-//        Log.d(TAG, sr.toString());
-
-//        requestQueue.add(sr);
-    }
-
-    public interface PostCommentResponseListener {
-        public void requestStarted();
-        public void requestCompleted();
-        public void requestEndedWithError(VolleyError error);
     }
 
 }

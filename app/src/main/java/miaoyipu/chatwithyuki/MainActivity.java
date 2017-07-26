@@ -1,11 +1,9 @@
 package miaoyipu.chatwithyuki;
 
+import android.content.Context;
 import android.content.Intent;
-import android.icu.text.DateFormat;
-import android.icu.text.SimpleDateFormat;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,39 +15,44 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
+
+import miaoyipu.chatwithyuki.Models.ChatMessage;
+import miaoyipu.chatwithyuki.Models.User;
+
+import static miaoyipu.chatwithyuki.Utility.YUKIUID;
+import static miaoyipu.chatwithyuki.Utility.dbSetUser;
+import static miaoyipu.chatwithyuki.Utility.postNewMessage;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MAIN";
-    private static final String KEY = "2e72cb905f084783b350f492786e2538";
-    private static final String UURL = "http://www.tuling123.com/openapi/api";
     private static final int SIGN_IN_REQUEST_CODE = 1;
     private static final java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd-MM-yy (HH:mm:ss)");
     private FirebaseListAdapter<ChatMessage> adapter;
-
-//    RequestQueue requestQueue = RequestQueueSingleton.getInstance(this.getApplicationContext()).getRequestQueue();
+    private DatabaseReference database;
+    private FirebaseUser currentUser;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        context = this.getApplicationContext();
         checkUserState();
-        displayChatMessages();
+        database= FirebaseDatabase.getInstance().getReference();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
         setFab();
+        displayChatMessages();
     }
 
     private void setFab() {
@@ -58,26 +61,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 EditText input = (EditText)findViewById(R.id.main_textInput);
-                FirebaseDatabase.getInstance()
-                        .getReference()
-                        .push()
-                        .setValue(
-                                new ChatMessage(input.getText().toString(),
-                                        FirebaseAuth.getInstance().getCurrentUser().getDisplayName(),
-                                        FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        );
-
-                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                postMessage(input.getText().toString(), uid);
+                RequestQueueSingleton.postNewMessage(context, database, input.getText().toString(), currentUser); // Post message to chat bot.
+                postNewMessage(database, currentUser, input.getText().toString(), getString(R.string.yukiUid)); // Post message to database.
 
                 input.setText("");
             }
         });
-    }
-
-    private void postMessage(String input, String uid) {
-        Log.d(TAG, uid);
-        RequestQueueSingleton.postNewMessage(this.getApplicationContext(), input, uid);
     }
 
     /* Check whether user is already signed in. */
@@ -118,6 +107,19 @@ public class MainActivity extends AppCompatActivity {
                 finish(); // close the app
             }
         }
+
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        addNewUser();
+//        displayChatMessages();
+    }
+
+    /**
+     * Add the current user to the database as a User object under users
+     * if not exist already.
+     */
+    private void addNewUser() {
+        User newUser = new User(currentUser.getUid(), currentUser.getDisplayName());
+        dbSetUser(database, newUser);
     }
 
     @Override
@@ -143,19 +145,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayChatMessages() {
         ListView msgList = (ListView)findViewById(R.id.main_msgList);
-        adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class, R.layout.messages, FirebaseDatabase.getInstance().getReference()) {
+
+        DatabaseReference dbref = database.child("users")
+                                            .child(currentUser.getUid())
+                                            .child("chats")
+                                            .child(YUKIUID);
+
+        Log.d(TAG, dbref.toString());
+        adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class, R.layout.messages, dbref) {
             @Override
             protected void populateView(View v, ChatMessage model, int position) {
-                if (model.getUid() == FirebaseAuth.getInstance().getCurrentUser().getUid()) {
-                    TextView msgText = (TextView)v.findViewById(R.id.messages_msgContent);
-                    TextView msgUser = (TextView)v.findViewById(R.id.messages_userId);
-                    TextView msgTime = (TextView)v.findViewById(R.id.messages_timeStamp);
+                TextView msgText = (TextView)v.findViewById(R.id.messages_msgContent);
+                TextView msgUser = (TextView)v.findViewById(R.id.messages_userId);
+                TextView msgTime = (TextView)v.findViewById(R.id.messages_timeStamp);
 
-                    msgText.setText(model.getMsgText());
-                    msgUser.setText(model.getMsgUser());
-                    Date date = new Date(model.getMsgTime());
-                    msgTime.setText(dateFormat.format(date));
-                }
+                msgText.setText(model.getMsgText());
+                msgUser.setText(model.getAuthorName());
+                Date date = new Date(model.getMsgTime());
+                msgTime.setText(dateFormat.format(date));
             }
         };
         msgList.setAdapter(adapter);
