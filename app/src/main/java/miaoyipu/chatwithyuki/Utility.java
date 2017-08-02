@@ -6,7 +6,10 @@ import android.util.Log;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 
+import java.text.SimpleDateFormat;
+
 import miaoyipu.chatwithyuki.Models.ChatMessage;
+import miaoyipu.chatwithyuki.Models.GroupMessage;
 import miaoyipu.chatwithyuki.Models.User;
 
 /**
@@ -17,6 +20,7 @@ public class Utility {
     private static final String TAG = "UTLI";
     public static final String YUKI = "小白白";
     public static final String YUKIUID = "000000";
+    public static final SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd-MM-yy (HH:mm:ss)");
 
     private Utility() {} // Prevent the class from being constructed.
 
@@ -54,6 +58,18 @@ public class Utility {
         dbSetMessage(database, chatMessage, targetUid, YUKIUID);
     }
 
+    public static void postGroupMessage(DatabaseReference database, FirebaseUser user, String message) {
+        GroupMessage groupMessage = new GroupMessage(message, user.getDisplayName(), user.getUid());
+
+        dbSetGroupMessage(database, groupMessage);
+    }
+
+    public static void dbSetGroupMessage(DatabaseReference database, GroupMessage message) {
+        database.child("groupMessages")
+                .push()
+                .setValue(message);
+    }
+
     /**
      * Set message to the database.
      * @param database
@@ -70,6 +86,11 @@ public class Utility {
                 .setValue(chatMessage);
     }
 
+    /**
+     * Set new User to database
+     * @param database
+     * @param user
+     */
     public static void dbSetUser(DatabaseReference database, User user) {
         database.child("users")
                 .child(user.getId())

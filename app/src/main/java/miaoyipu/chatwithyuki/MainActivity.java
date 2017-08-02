@@ -36,7 +36,6 @@ import static miaoyipu.chatwithyuki.Utility.postNewMessage;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MAIN";
     private static final int SIGN_IN_REQUEST_CODE = 1;
-    private static final java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd-MM-yy (HH:mm:ss)");
     private FirebaseListAdapter<ChatMessage> adapter;
     private DatabaseReference database;
     private FirebaseUser currentUser;
@@ -139,6 +138,10 @@ public class MainActivity extends AppCompatActivity {
                             finish();
                         }
                     });
+        } else if (item.getItemId() == R.id.menu_group_chat) {
+            Log.d(TAG, "Openning Group Chat");
+            Intent intent = new Intent(this, GroupChatActivity.class);
+            startActivity(intent);
         }
         return true;
     }
@@ -151,8 +154,8 @@ public class MainActivity extends AppCompatActivity {
                                             .child("chats")
                                             .child(YUKIUID);
 
-        Log.d(TAG, dbref.toString());
-        adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class, R.layout.messages, dbref) {
+
+        adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class, R.layout.messages, dbref.limitToLast(50)) {
             @Override
             protected void populateView(View v, ChatMessage model, int position) {
                 TextView msgText = (TextView)v.findViewById(R.id.messages_msgContent);
@@ -162,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 msgText.setText(model.getMsgText());
                 msgUser.setText(model.getAuthorName());
                 Date date = new Date(model.getMsgTime());
-                msgTime.setText(dateFormat.format(date));
+                msgTime.setText(Utility.dateFormat.format(date));
             }
         };
         msgList.setAdapter(adapter);
